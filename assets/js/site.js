@@ -309,7 +309,7 @@
     const measure = () => { centers = chars.map((c) => { const r = c.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2 + scrollY]; }); };
     measure();
     document.fonts?.ready.then(measure);
-    addEventListener('resize', measure);
+    addEventListener('resize', () => { name.style.fontSize = ''; measure(); });
     [1800, 5200].forEach((t) => setTimeout(measure, t)); // after the intro and entrance settle
 
     let px = -9999, py = -9999, lastMove = 0, speed = 0, lx = 0, ly = 0, lt = performance.now();
@@ -360,12 +360,14 @@
         const [x, y] = centers[i] || [0, 0];
         const f = Math.exp(-(((x - cx) ** 2 + (y - cy) ** 2) / (R * R)));
         const tw = c._line ? 800 - 600 * f : 250 + 620 * f;
-        // on narrow screens only the weight moves, so the name never re-wraps
-        const td = innerWidth < 900 ? c._d : c._line ? 112 - 24 * f : 100 + 22 * f;
+        // only the weight swells; the light line never widens, so the name keeps its width
+        const td = c._line ? 112 - 24 * f : 100;
         c._w += (tw - c._w) * 0.14; c._d += (td - c._d) * 0.14;
         c.style.setProperty('--w', c._w.toFixed(1));
         c.style.setProperty('--d', c._d.toFixed(1));
       });
+      // safety: if the name would ever run past the screen edge, step the size down until it fits
+      if (name.scrollWidth > name.clientWidth + 1) name.style.fontSize = parseFloat(getComputedStyle(name).fontSize) * 0.985 + 'px';
 
       // pulse: cursor speed raises the heart rate, it settles back when still
       speed *= 0.94;

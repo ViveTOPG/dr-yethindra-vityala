@@ -204,7 +204,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hero-bg::after { content: ""; position: absolute; inset: auto 0 0 0; height: 16%; background: linear-gradient(transparent, rgba(239, 236, 229, 0.55)); }
 .hero-name {
   margin: 0; padding: 0 var(--gutter); font-weight: 250; text-transform: uppercase; line-height: 0.9; text-align: center;
-  letter-spacing: -0.05em; font-size: clamp(54px, 7.3vw, 150px); white-space: nowrap; position: relative; z-index: 3; color: var(--ink);
+  letter-spacing: -0.05em; font-size: clamp(48px, 6.5vw, 140px); white-space: nowrap; position: relative; z-index: 3; color: var(--ink);
 }
 .hero-name .dr { font-family: var(--f-hand); text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--blue); font-size: 0.5em; vertical-align: 0.7em; margin-right: 0.08em; }
 .hero-name .line { display: inline-block; overflow: hidden; vertical-align: top; }
@@ -216,11 +216,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hero-name b { font-weight: inherit; }
 .hero-stage { position: relative; z-index: 2; flex: 1; }
 .hero-left { position: absolute; left: var(--gutter); bottom: 30px; max-width: 360px; }
-.hero-left p { margin: 0 0 14px; font-size: 16.5px; line-height: 1.42; letter-spacing: -0.01em; }
+.hero-left p { margin: 0; font-size: 17px; line-height: 1.42; letter-spacing: -0.01em; }
 .hero-left .tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .hero-left .tag { background: rgba(255, 255, 255, 0.5); }
 .hero-right { position: absolute; right: var(--gutter); bottom: 30px; text-align: right; display: grid; gap: 4px; justify-items: end; }
-.hero-cta { display: flex; gap: 8px; margin-bottom: 14px; }
+.hero-cta { display: flex; gap: 8px; margin-bottom: 12px; }
 .hero-right .cities { font-family: var(--f-mono); font-size: 12px; text-transform: uppercase; line-height: 1.5; }
 .hero-right .mono { color: var(--ink-2); }
 
@@ -229,7 +229,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .hero-bg { bottom: auto; height: 86svh; }
   .hero-bg img { object-position: 50% 100%; }
   .hero-bg::after { height: 30%; background: linear-gradient(transparent, var(--paper)); }
-  .hero-name { font-size: clamp(40px, 12.4vw, 120px); text-align: left; }
+  .hero-name { font-size: clamp(36px, 11.4vw, 110px); text-align: left; }
   .hero-name .line { display: block; white-space: nowrap; }
   .hero-name .line + .line { margin-left: 0; }
   .hero-stage { padding-top: calc(86svh - var(--nav-h) - 2 * 0.9 * clamp(40px, 12.4vw, 120px) - 40px); display: flex; flex-direction: column; }
