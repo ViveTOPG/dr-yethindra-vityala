@@ -187,7 +187,8 @@
       d += ` L${nx - 30} ${mid} L${nx - 18} ${mid + 14} L${nx - 6} ${mid - H * amp} L${nx + 8} ${mid + H * 0.3} L${nx + 20} ${mid} q 22 -22 44 0`;
       x = nx + 64;
       const n = nodes[i];
-      n.style.left = nx - 6 + 'px';
+      // pin the dot to the exact tip: the peak (up) or the trough (down) of this spike
+      n.style.left = (i % 2 ? nx + 8 : nx - 6) + 'px';
       n.style.top = (i % 2 ? mid + H * 0.3 : mid - H * amp) + 'px';
       n.classList.add(i % 2 ? 'down' : 'up');
     });

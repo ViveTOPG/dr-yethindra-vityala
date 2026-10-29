@@ -128,7 +128,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .topbar.on-dark.is-scrolled { background: rgba(11, 12, 16, 0.78); box-shadow: 0 1px 0 rgba(255,255,255,0.08); }
 .brand { font-weight: 400; font-size: 19px; letter-spacing: -0.02em; text-transform: uppercase; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
 .brand b { font-weight: 800; }
-.brand .ecg-mini { width: 26px; height: 14px; color: var(--pulse); }
+.brand { padding: 8px 6px 8px 0; }
+.brand .ecg-mini { width: 40px; height: 22px; color: var(--pulse); transition: transform 0.4s var(--ease); }
+.brand:hover .ecg-mini { transform: scale(1.12); }
 .nav { display: flex; gap: 4px; }
 .nav a {
   font-family: var(--f-mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.02em;
@@ -139,7 +141,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .nav a:hover::before, .nav a:hover::after, .nav a[aria-current="page"]::before, .nav a[aria-current="page"]::after { opacity: 1; }
 .nav a[aria-current="page"] { color: var(--blue); }
 .on-dark .nav a[aria-current="page"] { color: #9fb0ff; }
-.top-cta { display: flex; gap: 8px; align-items: center; }
+.top-cta { display: flex; gap: 8px; align-items: center; justify-content: flex-end; flex: 1 1 0; }
+.topbar > .brand { flex: 1 1 0; }
 .menu-btn { display: none; width: 44px; height: 44px; align-items: center; justify-content: center; }
 .menu-btn span { display: block; width: 22px; height: 1.5px; background: currentColor; position: relative; }
 .menu-btn span::before, .menu-btn span::after { content: ""; position: absolute; left: 0; width: 100%; height: 1.5px; background: currentColor; transition: transform 0.4s var(--ease); }
@@ -310,7 +313,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .ecg-node.on { opacity: 1; }
 .ecg-node.on .card { transform: translate(-50%, 0); }
 .ecg-svg .pen { fill: var(--pulse); filter: drop-shadow(0 0 6px rgba(226, 65, 46, 0.8)); }
-.ecg-node .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--pulse); box-shadow: 0 0 0 6px rgba(226,65,46,0.15); position: absolute; left: 50%; transform: translate(-50%, -50%); }
+.ecg-node .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--pulse); border: 2.5px solid var(--paper); box-shadow: 0 0 0 1px rgba(226,65,46,0.35); position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%); z-index: 1; }
 .ecg-node .card { position: absolute; left: 50%; transform: translateX(-50%); width: 240px; background: var(--card); border: 1px solid var(--line); padding: 12px 14px; box-shadow: 0 10px 30px -18px rgba(0,0,0,0.3); }
 .ecg-node.up .card { bottom: 22px; }
 .ecg-node.down .card { top: 22px; }
