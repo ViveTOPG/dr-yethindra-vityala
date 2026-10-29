@@ -82,9 +82,9 @@
     if (!hasGSAP || reduced) return;
     const lines = $$('.hero-name .line > span, .phero h1 .split-line > span');
     if (lines.length) gsap.from(lines, { yPercent: 110, duration: 1.2, ease: 'expo.out', stagger: 0.08 });
-    const photo = $('.hero-photo img');
-    if (photo) gsap.from(photo, { scale: 1.15, duration: 1.8, ease: 'expo.out' });
-    gsap.from('.hero-left, .hero-right, .hero-note, .phero-grid > *, .phero .crumb', { y: 24, opacity: 0, duration: 1, ease: 'power3.out', stagger: 0.06, delay: 0.25 });
+    const photo = $('.hero-bg img');
+    if (photo) gsap.from(photo, { scale: 1.08, duration: 2, ease: 'expo.out' });
+    gsap.from('.hero-left, .hero-right, .phero-grid > *, .phero .crumb', { y: 24, opacity: 0, duration: 1, ease: 'power3.out', stagger: 0.06, delay: 0.25 });
   }
   if (loader) {
     let seen = false;
@@ -148,6 +148,13 @@
       trigger: el, start: 'top 90%', once: true,
       onEnter: () => gsap.to(o, { v: end, duration: 2, ease: 'power3.out', onUpdate: () => { el.textContent = Math.round(o.v).toLocaleString('en-IN'); } }),
     });
+  });
+
+  /* ---------- big portrait: clip reveal from the bottom, image settles from a zoom ---------- */
+  $$('[data-clip-reveal] .ip-frame').forEach((f) => {
+    const img = $('img', f);
+    gsap.fromTo(f, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', ease: 'none', scrollTrigger: { trigger: f, start: 'top 90%', end: 'top 30%', scrub: true } });
+    gsap.fromTo(img, { scale: 1.16, yPercent: -3 }, { scale: 1.0, yPercent: 3, ease: 'none', scrollTrigger: { trigger: f, start: 'top bottom', end: 'bottom top', scrub: true } });
   });
 
   /* ---------- polaroid parallax ---------- */
@@ -275,7 +282,7 @@
     const hero = $('.hero');
     if (!hero || reduced) return;
     const name = $('.hero-name', hero);
-    const photo = $('.hero-photo', hero);
+    const photo = $('.hero-bg img', hero);
     const canvas = $('.hero-ecg', hero);
     const bpmEl = $('.hero-bpm b', hero);
     const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
