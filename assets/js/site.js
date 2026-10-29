@@ -153,8 +153,8 @@
   /* ---------- big portrait: clip reveal from the bottom, image settles from a zoom ---------- */
   $$('[data-clip-reveal] .ip-frame').forEach((f) => {
     const img = $('img', f);
-    gsap.fromTo(f, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', ease: 'none', scrollTrigger: { trigger: f, start: 'top 90%', end: 'top 30%', scrub: true } });
-    gsap.fromTo(img, { scale: 1.16, yPercent: -3 }, { scale: 1.0, yPercent: 3, ease: 'none', scrollTrigger: { trigger: f, start: 'top bottom', end: 'bottom top', scrub: true } });
+    gsap.fromTo(f, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', ease: 'none', scrollTrigger: { trigger: f, start: 'top 95%', end: 'top 55%', scrub: true } });
+    gsap.fromTo(img, { scale: 1.1 }, { scale: 1.0, ease: 'none', scrollTrigger: { trigger: f, start: 'top bottom', end: 'bottom top', scrub: true } });
   });
 
   /* ---------- polaroid parallax ---------- */

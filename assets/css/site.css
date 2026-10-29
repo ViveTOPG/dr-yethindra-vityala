@@ -273,19 +273,16 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* ---------- intro: big cropped B&W portrait bleeding off the right edge ---------- */
 .intro-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 90px); align-items: center; }
-.intro-portrait { position: relative; margin: 0 calc(var(--gutter) * -1) 0 0; }
-.ip-frame { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: #d9d6ce; clip-path: inset(0 0 0 0); }
-.ip-frame img { position: absolute; inset: -6% 0; width: 100%; height: 112%; object-fit: cover; object-position: 76% 30%; filter: grayscale(1) contrast(1.22) brightness(1.04); transform: scale(1.04); will-change: transform; }
-/* film grain + soft vignette */
-.ip-frame::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: multiply; opacity: 0.45;
+.intro-portrait { position: relative; margin: 0; max-width: 560px; justify-self: end; width: 100%; }
+.ip-frame { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: #d8d8d6; }
+.ip-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; will-change: transform; }
+/* faint film grain so it sits with the paper texture */
+.ip-frame::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: multiply; opacity: 0.18;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
-.ip-frame::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(120% 90% at 60% 40%, transparent 55%, rgba(14, 15, 19, 0.35)); }
-.intro-portrait figcaption { margin-top: 12px; color: var(--ink-2); }
+.intro-portrait figcaption { display: flex; justify-content: space-between; gap: 12px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line-2); color: var(--ink-2); }
 @media (max-width: 760px) {
   .intro-grid { grid-template-columns: 1fr; }
-  .intro-portrait { margin: 0 calc(var(--gutter) * -1); }
-  .ip-frame { aspect-ratio: 1 / 1; }
-  .intro-portrait figcaption { padding: 0 var(--gutter); }
+  .intro-portrait { max-width: none; justify-self: stretch; }
 }
 
 /* ---------- stats ---------- */
