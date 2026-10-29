@@ -220,6 +220,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hero-left .tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .hero-left .tag { background: rgba(255, 255, 255, 0.5); }
 .hero-right { position: absolute; right: var(--gutter); bottom: 30px; text-align: right; display: grid; gap: 4px; justify-items: end; }
+.hero-cta { display: flex; gap: 8px; margin-bottom: 14px; }
 .hero-right .cities { font-family: var(--f-mono); font-size: 12px; text-transform: uppercase; line-height: 1.5; }
 .hero-right .mono { color: var(--ink-2); }
 
