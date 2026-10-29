@@ -207,8 +207,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   letter-spacing: -0.05em; font-size: clamp(48px, 6.5vw, 140px); white-space: nowrap; position: relative; z-index: 3; color: var(--ink);
 }
 .hero-name .dr { font-family: var(--f-hand); text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--blue); font-size: 0.5em; vertical-align: 0.7em; margin-right: 0.08em; }
-.hero-name .line { display: inline-block; overflow: hidden; vertical-align: top; }
-.hero-name .line + .line { margin-left: 0.22em; }
+.hero-name .line { display: inline-block; overflow: hidden; vertical-align: top; padding: 0 0.14em; margin: 0 -0.14em; }
+.hero-name .line + .line { margin-left: 0.08em; }
 .hero-name .line > span { display: inline-block; }
 /* cursor-responsive name */
 .hero-name .ch { display: inline-block; font-variation-settings: "wght" var(--w, 250), "wdth" var(--d, 100); will-change: font-variation-settings; }
@@ -231,7 +231,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .hero-bg::after { height: 30%; background: linear-gradient(transparent, var(--paper)); }
   .hero-name { font-size: clamp(36px, 11.4vw, 110px); text-align: left; }
   .hero-name .line { display: block; white-space: nowrap; }
-  .hero-name .line + .line { margin-left: 0; }
+  .hero-name .line + .line { margin-left: -0.14em; }
   .hero-stage { padding-top: calc(86svh - var(--nav-h) - 2 * 0.9 * clamp(40px, 12.4vw, 120px) - 40px); display: flex; flex-direction: column; }
   .hero-left, .hero-right { position: relative; left: auto; right: auto; bottom: auto; padding: 18px var(--gutter) 0; text-align: left; justify-items: start; max-width: none; }
   .hero-right { padding-bottom: 36px; }
