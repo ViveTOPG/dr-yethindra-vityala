@@ -42,7 +42,9 @@
       bar.classList.toggle('is-hidden', y > 300 && y > last && !document.body.classList.contains('menu-open'));
       last = y;
       const probe = 30;
-      bar.classList.toggle('on-dark', darkSecs.some((s) => { const r = s.getBoundingClientRect(); return r.top <= probe && r.bottom >= probe; }));
+      const over = darkSecs.find((s) => { const r = s.getBoundingClientRect(); return r.top <= probe && r.bottom >= probe; });
+      bar.classList.toggle('on-dark', !!over);
+      bar.classList.toggle('on-blue', over?.dataset.dark === 'blue');
     };
     addEventListener('scroll', onScroll, { passive: true });
     onScroll();
@@ -247,7 +249,6 @@
     initLibrary();
     initTheatre();
     initAccordion();
-    initContactWords();
     initForm();
     $$('.marquee-track').forEach((t) => { if (!t.dataset.dup) { t.innerHTML += t.innerHTML; t.dataset.dup = 1; } });
     if (reduced || !hasGSAP) $$('[data-count]').forEach((el) => { el.textContent = Number(el.dataset.count).toLocaleString('en-IN'); });
@@ -638,25 +639,6 @@
       b.setAttribute('aria-expanded', String(open));
       if (hasGSAP) setTimeout(() => ScrollTrigger.refresh(), 520);
     }));
-  }
-
-  /* contact: "contact" in the languages of his journey, drifting with the cursor */
-  function initContactWords() {
-    const box = $('.contact-words');
-    if (!box) return;
-    const spans = $$('span', box);
-    spans.forEach((s, i) => {
-      s.style.left = (8 + ((i * 37) % 80)) + '%';
-      s.style.top = (10 + ((i * 53) % 78)) + '%';
-      s.dataset.depth = (0.3 + (i % 4) * 0.25).toFixed(2);
-    });
-    if (reduced) return;
-    const sec = box.closest('section');
-    sec.addEventListener('pointermove', (e) => {
-      const r = sec.getBoundingClientRect();
-      const dx = (e.clientX - r.left) / r.width - 0.5, dy = (e.clientY - r.top) / r.height - 0.5;
-      spans.forEach((s) => { s.style.transform = `translate(${dx * -60 * s.dataset.depth}px, ${dy * -40 * s.dataset.depth}px)`; });
-    });
   }
 
   /* contact form: composes an email (no server needed) */
