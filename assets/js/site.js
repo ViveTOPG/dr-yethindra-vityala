@@ -128,11 +128,13 @@
     });
   });
 
-  /* ---------- big portrait: clip reveal from the bottom, image settles from a zoom ---------- */
+  /* ---------- big portrait: ink spreads out from the centre, image settles from a slight zoom ---------- */
   $$('[data-clip-reveal] .ip-frame').forEach((f) => {
     const img = $('img', f);
-    gsap.fromTo(f, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', ease: 'none', scrollTrigger: { trigger: f, start: 'top 95%', end: 'top 55%', scrub: true } });
-    gsap.fromTo(img, { scale: 1.1 }, { scale: 1.0, ease: 'none', scrollTrigger: { trigger: f, start: 'top bottom', end: 'bottom top', scrub: true } });
+    const ink = { r: 0 };
+    gsap.to(ink, { r: 150, ease: 'none', onUpdate: () => f.style.setProperty('--r', ink.r + '%'), scrollTrigger: { trigger: f, start: 'top 92%', end: 'top 45%', scrub: true } });
+    f.style.setProperty('--r', '0%');
+    gsap.fromTo(img, { scale: 1.05 }, { scale: 1.0, ease: 'none', scrollTrigger: { trigger: f, start: 'top bottom', end: 'bottom top', scrub: true } });
   });
 
   /* ---------- polaroid parallax ---------- */
