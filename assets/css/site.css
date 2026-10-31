@@ -56,7 +56,6 @@ body {
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
-body.is-loading { overflow: hidden; }
 img, video, svg { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
@@ -173,27 +172,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 @media (max-width: 520px) {
   .top-cta .pill { display: none; }
   .brand { font-size: 16px; }
-}
-
-/* ---------- intro loader (pamidor: name parts around a photo tile) ---------- */
-.loader {
-  position: fixed; inset: 0; z-index: 100; background: var(--paper);
-  display: grid; place-items: center; overflow: hidden;
-}
-.loader-row { display: flex; align-items: center; gap: clamp(8px, 1.4vw, 22px); }
-.loader-word {
-  font-weight: 800; font-variation-settings: "wdth" 118; text-transform: uppercase;
-  font-size: clamp(30px, 7vw, 120px); letter-spacing: -0.04em; line-height: 1;
-}
-.loader-tile {
-  width: clamp(64px, 9vw, 150px); aspect-ratio: 4 / 5; overflow: hidden; background: var(--paper-2);
-  flex: none;
-}
-.loader-tile img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.05); }
-.loader-meta { position: absolute; left: var(--gutter); right: var(--gutter); bottom: 22px; display: flex; justify-content: space-between; }
-.loader-ecg { position: absolute; left: 0; right: 0; top: 50%; height: 120px; transform: translateY(-50%); color: var(--pulse); opacity: 0.0; pointer-events: none; }
-@media (max-width: 640px) {
-  .loader-row { flex-direction: column; }
 }
 
 /* ---------- HOME hero (alejandroha giant name + pamidor portrait) ---------- */
@@ -793,5 +771,4 @@ html, body { overflow-x: clip; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
   [data-reveal] { opacity: 1 !important; transform: none !important; }
-  .loader { display: none; }
 }
