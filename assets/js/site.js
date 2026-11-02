@@ -51,19 +51,37 @@
   }
 
   /* ---------- drawer menu ---------- */
+  /* keeps Tab inside an open dialog; call the returned function to let go */
+  const trapFocus = (box) => {
+    const onKey = (e) => {
+      if (e.key !== 'Tab') return;
+      const items = $$('a[href], button, input, select, textarea, iframe', box).filter((x) => !x.disabled && x.getClientRects().length);
+      if (!items.length) return;
+      const first = items[0], last = items[items.length - 1], at = document.activeElement;
+      if (!box.contains(at) || (e.shiftKey && at === first)) { e.preventDefault(); (e.shiftKey ? last : first).focus(); }
+      else if (!e.shiftKey && at === last) { e.preventDefault(); first.focus(); }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  };
+
   const drawer = $('.drawer');
+  let releaseMenu = null;
   const openMenu = (open) => {
     if (!drawer) return;
+    const was = drawer.classList.contains('is-open');
     drawer.classList.toggle('is-open', open);
     drawer.setAttribute('aria-hidden', String(!open));
     document.body.classList.toggle('menu-open', open);
     $('.menu-btn')?.setAttribute('aria-expanded', String(open));
     open ? lenis?.stop() : lenis?.start();
-    if (open) $('.drawer nav a')?.focus();
+    if (open) { releaseMenu = trapFocus(drawer); $('.drawer nav a')?.focus(); }
+    else if (was) { releaseMenu?.(); $('.menu-btn')?.focus(); }
   };
   $('.menu-btn')?.addEventListener('click', () => openMenu(true));
   $('.drawer-close')?.addEventListener('click', () => openMenu(false));
   $$('.drawer a').forEach((a) => a.addEventListener('click', () => openMenu(false)));
+  addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer?.classList.contains('is-open')) openMenu(false); });
 
   /* ---------- toast ---------- */
   const toast = (msg) => {
@@ -83,7 +101,9 @@
     if (lines.length) gsap.from(lines, { yPercent: 110, duration: 1.2, ease: 'expo.out', stagger: 0.08 });
     const photo = $('.hero-bg img');
     if (photo) gsap.from(photo, { scale: 1.08, duration: 2, ease: 'expo.out' });
-    gsap.from('.hero-left, .hero-right, .phero-grid > *, .phero .crumb', { y: 24, opacity: 0, duration: 1, ease: 'power3.out', stagger: 0.06, delay: 0.25 });
+    let fromSite = false;
+    try { fromSite = 'onpagereveal' in window && new URL(document.referrer).origin === location.origin; } catch {}
+    if (!fromSite) gsap.from('.hero-left, .hero-right, .phero-grid > *, .phero .crumb', { y: 24, opacity: 0, duration: 1, ease: 'power3.out', stagger: 0.06, delay: 0.25 });
   }
   heroIn();
 
@@ -417,7 +437,7 @@
       const f = was ? 'all' : b.dataset.filter;
       $$('[data-filter="' + f + '"]', group).forEach((x) => x.setAttribute('aria-pressed', 'true'));
       const table = $(group.dataset.for) || tables[0];
-      $$('.el:not(.el--gap)', table).forEach((el) => el.classList.toggle('is-dim', f !== 'all' && el.dataset.cat !== f));
+      $$('.el:not(.el--gap)', table).forEach((el) => { const dim = f !== 'all' && el.dataset.cat !== f; el.classList.toggle('is-dim', dim); el.tabIndex = dim ? -1 : 0; });
     }));
     // live inspector + cursor spotlight / tilt / glow
     const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -465,7 +485,7 @@
     });
 
     if (!modal) return;
-    let idx = 0, lastFocus = null;
+    let idx = 0, lastFocus = null, release = null;
     const visible = () => $$('.el:not(.el--gap):not(.is-dim)').map((e) => +e.dataset.i);
     const render = (i) => {
       const h = data[i]; if (!h) return;
@@ -488,11 +508,11 @@
         const n = v[(p + +b.dataset.step + v.length) % v.length];
         const card = $('.eld-card', modal);
         card.animate([{ transform: 'perspective(1400px) rotateY(0)' }, { transform: `perspective(1400px) rotateY(${b.dataset.step > 0 ? -90 : 90}deg)` }], { duration: 220, easing: 'ease-in' })
-          .onfinish = () => { render(n); card.animate([{ transform: `perspective(1400px) rotateY(${b.dataset.step > 0 ? 90 : -90}deg)` }, { transform: 'perspective(1400px) rotateY(0)' }], { duration: 320, easing: 'cubic-bezier(.22,1,.36,1)' }); };
+          .onfinish = () => { render(n); $(`[data-step="${b.dataset.step}"]`, modal)?.focus(); card.animate([{ transform: `perspective(1400px) rotateY(${b.dataset.step > 0 ? 90 : -90}deg)` }, { transform: 'perspective(1400px) rotateY(0)' }], { duration: 320, easing: 'cubic-bezier(.22,1,.36,1)' }); };
       }));
     };
-    const open = (i) => { lastFocus = document.activeElement; render(i); modal.classList.add('is-open'); modal.setAttribute('aria-hidden', 'false'); lenis?.stop(); $('.eld-close', modal).focus(); };
-    const close = () => { modal.classList.remove('is-open'); modal.setAttribute('aria-hidden', 'true'); lenis?.start(); lastFocus?.focus(); };
+    const open = (i) => { lastFocus = document.activeElement; render(i); modal.classList.add('is-open'); modal.setAttribute('aria-hidden', 'false'); lenis?.stop(); release = trapFocus(modal); $('.eld-close', modal).focus(); };
+    const close = () => { modal.classList.remove('is-open'); modal.setAttribute('aria-hidden', 'true'); lenis?.start(); release?.(); lastFocus?.focus(); };
     $$('.el:not(.el--gap)').forEach((el) => el.addEventListener('click', () => open(+el.dataset.i)));
     $('.eld-close', modal).addEventListener('click', close);
     $('.eld-bg', modal).addEventListener('click', close);
@@ -539,7 +559,7 @@
     // cite
     const cite = $('.cite');
     const pubs = window.__PUBS || [];
-    let cur = null, fmt = 'apa';
+    let cur = null, fmt = 'apa', lastFocus = null, release = null;
     const authorsList = (p) => (p.authors || 'Vityala Y').split(/,\s*|\s+and\s+|;\s*/).filter(Boolean);
     const formats = {
       apa: (p) => `${authorsList(p).join(', ')}. (${p.year || 'n.d.'}). ${p.title}. ${p.journal ? p.journal + '.' : ''}${p.doi ? ' https://doi.org/' + p.doi : p.url ? ' ' + p.url : ''}`,
@@ -550,11 +570,13 @@
     $$('[data-cite]').forEach((b) => b.addEventListener('click', () => {
       cur = pubs.find((p) => String(p.no) === b.dataset.cite); if (!cur) return;
       $('h3', cite).textContent = cur.title; show();
+      lastFocus = b;
       cite.classList.add('is-open'); cite.setAttribute('aria-hidden', 'false'); lenis?.stop();
+      release = trapFocus(cite); $('[data-copy]', cite)?.focus();
     }));
     $$('[data-fmt]', cite).forEach((b) => b.addEventListener('click', () => { fmt = b.dataset.fmt; show(); }));
     $('[data-copy]', cite)?.addEventListener('click', async () => { await copy($('.cite-out', cite).textContent); toast('Citation copied'); });
-    const close = () => { cite.classList.remove('is-open'); cite.setAttribute('aria-hidden', 'true'); lenis?.start(); };
+    const close = () => { cite.classList.remove('is-open'); cite.setAttribute('aria-hidden', 'true'); lenis?.start(); release?.(); lastFocus?.focus(); };
     $('.eld-bg', cite)?.addEventListener('click', close);
     $('[data-close]', cite)?.addEventListener('click', close);
     addEventListener('keydown', (e) => { if (e.key === 'Escape' && cite.classList.contains('is-open')) close(); });
@@ -619,6 +641,7 @@
         const n = $$('.talk', g).filter((t) => !t.hidden).length;
         g.hidden = !n;
         const yc = $('.yc', g); if (yc) yc.textContent = n;
+        const yw = $('.yw', g); if (yw) yw.textContent = n === 1 ? 'slide' : 'slides';
       });
       yearBtns.forEach((yb) => { yb.hidden = groups.find((g) => g.dataset.year === yb.dataset.jump)?.hidden; });
       const vis = talks.filter((t) => !t.hidden).length;
