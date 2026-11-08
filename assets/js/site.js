@@ -103,7 +103,7 @@
     if (photo) gsap.from(photo, { scale: 1.08, duration: 2, ease: 'expo.out' });
     let fromSite = false;
     try { fromSite = 'onpagereveal' in window && new URL(document.referrer).origin === location.origin; } catch {}
-    if (!fromSite) gsap.from('.hero-left, .hero-right, .phero-grid > *, .phero .crumb', { y: 24, opacity: 0, duration: 1, ease: 'power3.out', stagger: 0.06, delay: 0.25 });
+    if (!fromSite) gsap.from('.hero-kicker, .hero-foot > *, .phero-grid > *, .phero .crumb', { y: 24, opacity: 0, duration: 1, ease: 'power3.out', stagger: 0.06, delay: 0.25 });
   }
   heroIn();
 
@@ -270,6 +270,8 @@
     initPeriodicTable();
     initLibrary();
     initTheatre();
+    initSliders();
+    initAboutMark();
     initAccordion();
     initForm();
     $$('.marquee-track').forEach((t) => { if (!t.dataset.dup) { t.innerHTML += t.innerHTML; t.dataset.dup = 1; } });
@@ -366,7 +368,7 @@
         c.style.setProperty('--d', c._d.toFixed(1));
       });
       // safety: if the name would ever run past the screen edge, step the size down until it fits
-      if (name.scrollWidth > name.clientWidth + 1) name.style.fontSize = parseFloat(getComputedStyle(name).fontSize) * 0.985 + 'px';
+      if (name.scrollWidth > name.clientWidth + 2) name.style.fontSize = parseFloat(getComputedStyle(name).fontSize) * 0.985 + 'px';
 
       // pulse: cursor speed raises the heart rate, it settles back when still
       speed *= 0.94;
@@ -582,77 +584,90 @@
     addEventListener('keydown', (e) => { if (e.key === 'Escape' && cite.classList.contains('is-open')) close(); });
   }
 
-  /* speaking theatre: folder tabs + patient-monitor player */
+  /* speaking: the monitor projects the chosen talk; the filmstrip holds them all */
   function initTheatre() {
-    const th = $('.theatre');
-    if (!th) return;
-    const screen = $('.monitor-screen', th);
-    const info = $('.monitor-info', th);
-    const osd = $('.osd .ttl', th);
-    const talks = $$('.talk', th);
-    let cur = 0;
-    const ytId = (u) => (u || '').match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/)?.[1];
-    const select = (i, play = false) => {
-      const t = talks[i]; if (!t) return;
-      cur = i;
-      talks.forEach((x) => x.setAttribute('aria-current', String(x === t)));
-      const img = t.dataset.img, vid = t.dataset.video, id = ytId(vid);
-      if (play && id) screen.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0" title="${t.dataset.title}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
-      else {
-        screen.innerHTML = `${img ? `<img src="${img}" alt="">` : ''}<div class="scan"></div>${id || vid ? `<button class="play" aria-label="Play ${t.dataset.title}"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M7 4v16l13-8z" fill="currentColor"/></svg></button>` : ''}<div class="osd"><span class="ttl">${t.dataset.where || ''}</span><span>${t.dataset.year || ''}</span></div>`;
-        $('.play', screen)?.addEventListener('click', () => (id ? select(i, true) : window.open(vid, '_blank', 'noopener')));
-      }
-      if (info) {
-        info.textContent = '';
-        const b = document.createElement('b'); b.textContent = t.dataset.title; info.appendChild(b);
-        if (t.dataset.desc) { const p = document.createElement('span'); p.className = 'd'; p.textContent = t.dataset.desc; info.appendChild(p); }
-      }
-    };
-    // slide tray: keep the projected slide visible inside the tray (without moving the page)
-    const body = $('.tray-body', th);
-    const groups = $$('.tray-year', th);
-    const yearBtns = $$('[data-jump]', th);
-    const reveal = (el) => {
-      if (!body || !el) return;
-      const top = el.offsetTop - body.offsetTop, h = el.offsetHeight;
-      if (top < body.scrollTop + 60 || top + h > body.scrollTop + body.clientHeight) body.scrollTo({ top: top - 70, behavior: 'smooth' });
-    };
-    const markYear = () => {
-      if (!body) return;
-      const y = body.scrollTop + 20;
-      let on = groups.find((g) => !g.hidden) || null;
-      groups.forEach((g) => { if (!g.hidden && g.offsetTop - body.offsetTop <= y) on = g; });
-      yearBtns.forEach((b) => b.classList.toggle('on', on && b.dataset.jump === on.dataset.year));
-    };
-    body?.addEventListener('scroll', markYear, { passive: true });
-    yearBtns.forEach((b) => b.addEventListener('click', () => {
-      const g = groups.find((x) => x.dataset.year === b.dataset.jump);
-      if (g) body.scrollTo({ top: g.offsetTop - body.offsetTop, behavior: 'smooth' });
-    }));
-    const step = (d) => { const v = talks.filter((t) => !t.hidden); const p = v.indexOf(talks[cur]); const n = talks.indexOf(v[(p + d + v.length) % v.length]); select(n); reveal(talks[n]); };
-    talks.forEach((t, i) => t.addEventListener('click', () => select(i)));
-    $('[data-prev]', th)?.addEventListener('click', () => step(-1));
-    $('[data-next]', th)?.addEventListener('click', () => step(1));
-    $$('.folder-tabs button').forEach((b) => b.addEventListener('click', () => {
-      $$('.folder-tabs button').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
-      const k = b.dataset.kind;
-      talks.forEach((t) => { t.hidden = k !== 'all' && t.dataset.kind !== k; });
-      groups.forEach((g) => {
-        const n = $$('.talk', g).filter((t) => !t.hidden).length;
-        g.hidden = !n;
-        const yc = $('.yc', g); if (yc) yc.textContent = n;
-        const yw = $('.yw', g); if (yw) yw.textContent = n === 1 ? 'slide' : 'slides';
+    $$('[data-theatre]').forEach((th) => {
+      const screen = $('.monitor-screen', th);
+      const strip = $('.strip', th);
+      const talks = $$('.slide', th);
+      const marks = $$('.strip-year', th);
+      const yearBtns = $$('[data-jump]', th);
+      const out = { i: $('.th-i', th), n: $('.th-n', th), kind: $('.th-kind', th), year: $('.th-year', th), title: $('.th-title', th), desc: $('.th-desc', th), total: $('.th-total', th) };
+      let cur = 0;
+      const shown = () => talks.filter((t) => !t.hidden);
+      const center = (el) => strip.scrollTo({ left: el.offsetLeft - (strip.clientWidth - el.offsetWidth) / 2, behavior: reduced ? 'auto' : 'smooth' });
+      const select = (i, scroll = true) => {
+        const t = talks[i]; if (!t) return;
+        cur = i;
+        talks.forEach((x) => x.setAttribute('aria-current', String(x === t)));
+        screen.innerHTML = `${t.dataset.img ? `<img src="${t.dataset.img}" alt="">` : ''}<div class="scan"></div><div class="osd"><span>${t.dataset.where || ''}</span><span>${t.dataset.year || ''}</span></div>`;
+        const v = shown();
+        out.i.textContent = String(v.indexOf(t) + 1).padStart(2, '0');
+        out.n.textContent = v.length;
+        out.kind.textContent = t.dataset.where;
+        out.year.textContent = t.dataset.year;
+        out.title.textContent = t.dataset.title;
+        out.desc.textContent = t.dataset.desc || '';
+        yearBtns.forEach((b) => b.classList.toggle('on', b.dataset.jump === t.dataset.year));
+        if (scroll) center(t);
+      };
+      const step = (d) => { const v = shown(); const p = v.indexOf(talks[cur]); select(talks.indexOf(v[(p + d + v.length) % v.length])); };
+      talks.forEach((t, i) => t.addEventListener('click', () => select(i)));
+      $$('[data-prev]', th).forEach((b) => b.addEventListener('click', () => step(-1)));
+      $$('[data-next]', th).forEach((b) => b.addEventListener('click', () => step(1)));
+      yearBtns.forEach((b) => b.addEventListener('click', () => { const t = shown().find((x) => x.dataset.year === b.dataset.jump); if (t) select(talks.indexOf(t)); }));
+      $$('[data-kind]', th).forEach((b) => b.addEventListener('click', () => {
+        $$('[data-kind]', th).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        const k = b.dataset.kind;
+        talks.forEach((t) => { t.hidden = k !== 'all' && t.dataset.kind !== k; });
+        marks.forEach((m) => { m.hidden = !talks.some((t) => !t.hidden && t.dataset.year === m.dataset.year); });
+        yearBtns.forEach((y) => { y.hidden = !talks.some((t) => !t.hidden && t.dataset.year === y.dataset.jump); });
+        if (out.total) out.total.textContent = shown().length + ' entries';
+        strip.scrollTo({ left: 0 });
+        const first = shown()[0]; if (first) select(talks.indexOf(first), false);
+      }));
+      // arrow keys anywhere inside, swipe on the screen
+      th.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
       });
-      yearBtns.forEach((yb) => { yb.hidden = groups.find((g) => g.dataset.year === yb.dataset.jump)?.hidden; });
-      const vis = talks.filter((t) => !t.hidden).length;
-      const cnt = $('.tray-count', th); if (cnt) cnt.textContent = vis;
-      const mc = $('.monitor-top > span:last-child', th); if (mc) mc.textContent = vis + ' entries';
-      body?.scrollTo({ top: 0 });
-      const first = talks.find((t) => !t.hidden); if (first) select(talks.indexOf(first));
-      markYear();
-    }));
-    select(0);
-    markYear();
+      let sx = null;
+      screen.addEventListener('pointerdown', (e) => { sx = e.clientX; });
+      screen.addEventListener('pointerup', (e) => { if (sx === null) return; const dx = e.clientX - sx; sx = null; if (Math.abs(dx) > 40) step(dx < 0 ? 1 : -1); });
+      select(0, false);
+    });
+  }
+
+  /* photo sliders: buttons move one frame; counter and bar follow the scroll */
+  function initSliders() {
+    $$('[data-slider]').forEach((s) => {
+      const track = $('.slider-track', s), cards = $$('.sl-card', s);
+      const count = $('.slider-count b', s), bar = $('.slider-bar i', s);
+      const [prev, next] = $$('.slider-btn', s);
+      const stepW = () => (cards[1] ? cards[1].offsetLeft - cards[0].offsetLeft : track.clientWidth);
+      const update = () => {
+        const max = track.scrollWidth - track.clientWidth;
+        const i = Math.min(cards.length - 1, Math.round(track.scrollLeft / stepW()));
+        count.textContent = String(i + 1).padStart(2, '0');
+        bar.style.width = (max > 0 ? Math.max(0.04, track.scrollLeft / max) : 1) * 100 + '%';
+        prev.disabled = track.scrollLeft < 4;
+        next.disabled = track.scrollLeft > max - 4;
+      };
+      [prev, next].forEach((b) => b.addEventListener('click', () => track.scrollBy({ left: stepW() * +b.dataset.dir, behavior: reduced ? 'auto' : 'smooth' })));
+      track.addEventListener('scroll', update, { passive: true });
+      track.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); (e.key === 'ArrowRight' ? next : prev).click(); } });
+      addEventListener('resize', update);
+      update();
+    });
+  }
+
+  /* the red "and" in the About title draws itself once it is on screen */
+  function initAboutMark() {
+    const t = $('.ab-title');
+    if (!t) return;
+    if (reduced || !('IntersectionObserver' in window)) { t.classList.add('is-in'); return; }
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { t.classList.add('is-in'); io.disconnect(); } }, { threshold: 0.6 });
+    io.observe(t);
   }
 
   /* dark accordion */
